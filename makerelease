@@ -1,0 +1,3 @@
+#!/bin/bash
+
+tar -cf delivery-cs.local.tar ./assets ./commands ./common ./components ./config ./controllers ./data ./mail ./models ./modules ./views ./web ./.htaccess

@@ -1,0 +1,210 @@
+html,
+body {
+    height: 100%;
+}
+
+.wrap {
+    min-height: 100%;
+    height: auto;
+    margin: 0 auto -60px;
+    padding: 0 0 60px;
+}
+
+.wrap > .container {
+    padding: 70px 15px 20px;
+    width: 1100px;
+}
+
+.container {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.footer {
+    height: 60px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+}
+
+.jumbotron {
+    text-align: center;
+    background-color: transparent;
+}
+
+.jumbotron .btn {
+    font-size: 21px;
+    padding: 14px 24px;
+}
+
+.not-set {
+    color: #c55;
+    font-style: italic;
+}
+
+/* add sorting icons to gridview sort links */
+a.asc:after, a.desc:after {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    padding-left: 5px;
+}
+
+a.asc:after {
+    content: /*"\e113"*/ "\e151";
+}
+
+a.desc:after {
+    content: /*"\e114"*/ "\e152";
+}
+
+.sort-numerical a.asc:after {
+    content: "\e153";
+}
+
+.sort-numerical a.desc:after {
+    content: "\e154";
+}
+
+.sort-ordinal a.asc:after {
+    content: "\e155";
+}
+
+.sort-ordinal a.desc:after {
+    content: "\e156";
+}
+
+.grid-view th {
+    white-space: nowrap;
+}
+
+.hint-block {
+    display: block;
+    margin-top: 5px;
+    color: #999;
+}
+
+.error-summary {
+    color: #a94442;
+    background: #fdf7f7;
+    border-left: 3px solid #eed3d7;
+    padding: 10px 20px;
+    margin: 0 0 15px 0;
+}
+
+.worker-photo {
+    height: 100px;
+    width: 60px;
+}
+
+.main-section {
+    background-color: cyan;
+    float: left;
+    margin: 0 20px;
+}
+
+.side-menu {
+    position: absolute;
+    top: 70px;
+    right: 0px;
+    width: 320px;
+    padding: 0 20px;
+}
+
+.model-item {
+    cursor: pointer;
+    text-decoration: none;
+    color: blue;
+    margin: 2px;
+    background: none repeat scroll #808080;
+    padding: 0.6em;
+    border-radius: 2px;
+    display: inline-block;
+}
+
+.model-item.active {
+    background: none repeat scroll #096ac8;
+}
+
+#model-name {
+    display: inline-block;
+    background-color: #CCCCCC;
+    height: 32px;
+    padding: 8px;
+}
+
+#package-model {
+    display: none;
+}
+
+.not_applied
+{
+    background: none repeat scroll 0 0 red;
+}
+
+.applied
+{
+    background: none repeat scroll 0 0 rgb(255, 255, 128);
+}
+
+.pickup
+{
+    background: none repeat scroll 0 0 rgb(255, 128, 64);
+}
+
+.canceled
+{
+    background: none repeat scroll 0 0 rgb(255, 64, 64);
+}
+
+
+.delivered
+{
+    background: none repeat scroll 0 0 rgb(128, 255, 128);
+}
+
+.backoff
+{
+    background: none repeat scroll 0 0 rgb(128, 128, 128);
+}
+
+.active-user-row {
+    background: none repeat scroll 0 0 rgb(255, 255, 255);
+}
+
+.inactive-user-row {
+    background: none repeat scroll 0 0 rgb(128, 128, 128);
+}
+
+.btn-action {
+    margin: 5px 5px;
+}
+
+.price-field {
+    display: inline-block;
+    width: 120px;
+}
+
+table.request-data td{
+    padding: 10px;
+}
+
+.form-group {
+    margin-bottom: 0px;
+}
+
+.help-block {
+    display: none;
+}
+
+.has-error .help-block {
+    display: block;
+}
+
+#history-config td {
+    padding: 5px;
+}
