@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS `tbl_deliveryman` (
   `phone` varchar(20) NOT NULL,
   `passport` text,
   `photo` varchar(255) DEFAULT NULL,
+  'balance' FLOAT NOT NULL DEFAULT 0.0,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

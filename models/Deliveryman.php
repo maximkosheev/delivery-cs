@@ -11,6 +11,11 @@ namespace app\models;
 use yii\base\Security;
 use yii\helpers\Url;
 
+/**
+ * Class Deliveryman
+ * @package app\models
+ * @property float $balance Текущий баланс курьера
+ */
 class Deliveryman extends Worker
 {
     public function behaviors()
@@ -79,26 +84,29 @@ class Deliveryman extends Worker
 
     public function afterSave($insert, $changedAttributes)
     {
-        /* обновление списка доступных типов посылок */
-        $db = \Yii::$app->db;
-        $transaction = $db->beginTransaction();
-        try {
-            $packageTypes = \Yii::$app->request->post('packageTypes');
-            $db->createCommand()
-                ->delete('tbl_user_package_type_assignment', 'user_id=:user_id', [':user_id' => $this->user_id])
-                ->execute();
-            // заново формируем список доступных типов посылок
-            $rows = [];
-            foreach ($packageTypes as $packageType) {
-                $rows[] = [$this->user_id, $packageType];
+        $packageTypes = \Yii::$app->request->post('packageTypes');
+        // если требуется обновление списка типов посылок
+        if ($packageTypes !== null) {
+            /* обновление списка доступных типов посылок */
+            $db = \Yii::$app->db;
+            $transaction = $db->beginTransaction();
+            try {
+                $db->createCommand()
+                    ->delete('tbl_user_package_type_assignment', 'user_id=:user_id', [':user_id' => $this->user_id])
+                    ->execute();
+                // заново формируем список доступных типов посылок
+                $rows = [];
+                foreach ($packageTypes as $packageType) {
+                    $rows[] = [$this->user_id, $packageType];
+                }
+                $db->createCommand()
+                    ->batchInsert('tbl_user_package_type_assignment', ['user_id', 'type_id'], $rows)
+                    ->execute();
+                $transaction->commit();
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
             }
-            $db->createCommand()
-                ->batchInsert('tbl_user_package_type_assignment', ['user_id', 'type_id'], $rows)
-                ->execute();
-            $transaction->commit();
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            throw $e;
         }
         parent::afterSave($insert, $changedAttributes);
     }
@@ -238,5 +246,15 @@ class Deliveryman extends Worker
             return false;
         $package->status = Package::STATUS_BACKOFF;
         return $package->save(true);
+    }
+
+    /**
+     * Изменяет значение баланса курьера на заданную величину
+     * @param $value величина денежных средств, поступающих/списывающихся на/с счет(а) курьера
+     */
+    public function updateBalance($value)
+    {
+        $this->balance += $value;
+        return $this->save(false, ['balance']);
     }
 }
