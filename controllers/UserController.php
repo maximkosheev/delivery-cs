@@ -183,7 +183,7 @@ class UserController extends Controller
             ]);
     }
 
-    public function actionDelete($id)
+    public function actionBlock($id)
     {
         $employer = Worker::findit($id);
 
@@ -199,7 +199,7 @@ class UserController extends Controller
         $this->redirect($employer->indexUrl);
     }
 
-    public function actionRestore($id)
+    public function actionUnblock($id)
     {
         $employer = Worker::findit($id);
 
