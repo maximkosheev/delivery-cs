@@ -34,6 +34,7 @@ $form = ActiveForm::begin([
 
 echo $form->field($model, 'deliveryman_id')->dropDownList($deliverymans, ['prompt' => 'Выберете курьера']);
 echo $form->field($model, 'cash')->textInput();
+echo $form->field($model, 'description')->textarea();
 echo '<br>';
 echo Html::submitButton('Отправить', ['class' => 'btn btn-lg btn-success']);
 

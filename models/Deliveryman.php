@@ -9,12 +9,14 @@
 namespace app\models;
 
 use yii\base\Security;
+use yii\db\ActiveQuery;
+use yii\db\Query;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
 /**
  * Class Deliveryman
  * @package app\models
- * @property float $balance Текущий баланс курьера
  */
 class Deliveryman extends Worker
 {
@@ -34,6 +36,13 @@ class Deliveryman extends Worker
                 'destAttr' => 'photo'
             ]
         ];
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'balance' => 'Баланс'
+        ]);
     }
 
     public function getPackageTypes()
@@ -117,8 +126,9 @@ class Deliveryman extends Worker
      */
     public function canUndertake($package)
     {
-        if (!$package->isVacant)
+        if (!$package->isVacant) {
             return false;
+        }
 
         foreach ($this->packageTypes as $packageType) {
             if ($package->package_type == $packageType->id)
@@ -130,17 +140,20 @@ class Deliveryman extends Worker
     /**
      * Устанавливает пользователя исполнителем по данной заявке
      * @param \app\models\Package $package
+     * @param boolean $validate
      */
-    public function undertake($package)
+    public function undertake($package, $validate = true)
     {
-        if (!$this->canUndertake($package))
-            return false;
+        if ($validate) {
+            if (!$this->canUndertake($package)) {
+                return false;
+            }
+        }
 
         $package->deliveryman_id = $this->user_id;
         $package->status = Package::STATUS_APPLIED;
         $package->open_time = date('Y-m-d H:i:s', time());
         return $package->save(true, ['deliveryman_id', 'status', 'open_time']);
-
     }
 
     /**
@@ -158,12 +171,15 @@ class Deliveryman extends Worker
     /**
      * Пользователь забрал посылку
      * @param \app\models\Package $package
+     * @param boolean $validate
      * @return bool true|false результат изменения статуса заявки
      */
-    public function collectit($package)
+    public function collectit($package, $validate = true)
     {
-        if (!$this->canCollect($package))
-            return false;
+        if ($validate) {
+            if (!$this->canCollect($package))
+                return false;
+        }
         $package->status = Package::STATUS_PICKUP;
         return $package->save(true, ['status']);
     }
@@ -186,14 +202,19 @@ class Deliveryman extends Worker
     /**
      * Получатель отказался от посылки
      * @param \app\models\Package $package
+     * @param boolean $validate
      * @return bool
      */
-    public function canceled($package)
+    public function canceled($package, $validate = true)
     {
-        if (!$this->canCancel($package))
-            return false;
+        if ($validate) {
+            if (!$this->canCancel($package))
+                return false;
+        }
         $package->status = Package::STATUS_CANCELED;
-        return $package->save(true, ['status']);
+        if (!$package->save(true, ['status']))
+            return false;
+        return true;
     }
 
     /**
@@ -214,12 +235,15 @@ class Deliveryman extends Worker
     /**
      * Завершает доставку
      * @param \app\models\Package $package
+     * @param boolean $validate
      * @return bool
      */
-    public function delivered($package)
+    public function delivered($package, $validate = true)
     {
-        if (!$this->canDelivered($package))
-            return false;
+        if ($validate) {
+            if (!$this->canDelivered($package))
+                return false;
+        }
         $package->status = Package::STATUS_DELIVERED;
         $package->close_time = date('Y-m-d H:i:s', time());
         return $package->save(true, ['status', 'close_time']);
@@ -238,23 +262,49 @@ class Deliveryman extends Worker
 
     /**
      * @param \app\models\Package $package
+     * @param boolean $validate
      * @return bool
      */
-    public function backoff($package)
+    public function backoff($package, $validate = true)
     {
-        if (!$this->canBackoff($package))
-            return false;
+        if ($validate) {
+            if (!$this->canBackoff($package))
+                return false;
+        }
         $package->status = Package::STATUS_BACKOFF;
-        return $package->save(true);
+        // сохраняем значение цены закупки, потому что при возврате это значение сбрасывается в 0
+        $purchase_price = $package->purchase_price;
+        if (!$package->save(true, ['status']))
+            return false;
+        return true;
     }
 
-    /**
-     * Изменяет значение баланса курьера на заданную величину
-     * @param $value величина денежных средств, поступающих/списывающихся на/с счет(а) курьера
-     */
-    public function updateBalance($value)
+    public function getBalance()
     {
-        $this->balance += $value;
-        return $this->save(false, ['balance']);
+        // подсчет баланса по журналу денежных операций
+        $b1 = FinancesLog::find()
+            ->where(['deliveryman_id' => $this->user_id])
+            ->sum('cash');
+        // подсчет списаний при закупках открытых заявок
+        $b2 = Package::find()
+            ->where(['deliveryman_id' => $this->user_id])
+            ->sum('purchase_price');
+        // подсчет начислений при продажах закрытых заявок
+        $b3 = Package::find()
+            ->where(['deliveryman_id' => $this->user_id])
+            ->andWhere(['status' => Package::STATUS_DELIVERED])
+            ->sum('selling_price');
+        // подсчет начислений при возвратах
+        $b4 = Package::find()
+            ->where(['deliveryman_id' => $this->user_id])
+            ->andWhere(['status' => Package::STATUS_BACKOFF])
+            ->sum('purchase_price');
+        // подсчет списаний "стоимость доставки"
+        $b5 = Package::find()
+            ->where(['deliveryman_id' => $this->user_id])
+            ->andWhere(['status' => Package::STATUS_DELIVERED])
+            ->sum('cost');
+
+        return $b1 - $b2 + $b3 +$b4 - $b5;
     }
 }

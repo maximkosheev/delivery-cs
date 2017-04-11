@@ -92,7 +92,6 @@ CREATE TABLE IF NOT EXISTS `tbl_deliveryman` (
   `phone` varchar(20) NOT NULL,
   `passport` text,
   `photo` varchar(255) DEFAULT NULL,
-  'balance' FLOAT NOT NULL DEFAULT 0.0,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -130,9 +129,9 @@ CREATE TABLE IF NOT EXISTS `tbl_package` (
   `model` varchar(50) DEFAULT NULL,
   `delivery_type` varchar(50) DEFAULT NULL,
   `more` text,
-  `cost` varchar(12) DEFAULT NULL,
-  `purchase_price` varchar(12) DEFAULT NULL,
-  `selling_price` varchar(12) DEFAULT NULL,
+  `cost` FLOAT DEFAULT NULL,
+  `purchase_price` FLOAT DEFAULT NULL,
+  `selling_price` FLOAT DEFAULT NULL,
   `create_time` datetime NOT NULL,
   `open_time` datetime DEFAULT NULL,
   `close_time` datetime DEFAULT NULL,
@@ -186,7 +185,20 @@ CREATE TABLE IF NOT EXISTS `tbl_user_package_type_assignment` (
   KEY `fk_package_type` (`type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
 --
+-- Table structure for table `tbl_user_package_type_assignment`
+--
+
+CREATE TABLE IF NOT EXISTS `tbl_finances_log` (
+  `deliveryman_id` int(11) NOT NULL,
+  `cash` float NULL,
+  `time` datetime NOT NULL,
+  `description` text,
+  KEY `fk_deliveryman_d` (`deliveryman_id`)
+)ENGINE=InnoDB DEFAULT CHARSET =utf8;
+-- --
 -- Constraints for dumped tables
 --
 
@@ -236,6 +248,13 @@ ALTER TABLE `tbl_package`
 ALTER TABLE `tbl_user_package_type_assignment`
   ADD CONSTRAINT `fk_package_type` FOREIGN KEY (`type_id`) REFERENCES `tbl_package_type` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_user_assignment` FOREIGN KEY (`user_id`) REFERENCES `tbl_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_finances_log`
+--
+ALTER TABLE `tbl_finances_log`
+    ADD CONSTRAINT `fk_deliveryman_d` FOREIGN KEY (`deliveryman_id`) REFERENCES `tbl_user` (`id`) ON UPDATE CASCADE
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

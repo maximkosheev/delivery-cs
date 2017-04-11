@@ -31,7 +31,7 @@ class ActionStatusMessage extends Widget
 
         $failedMessage = \Yii::$app->session->getFlash($this->failedKey, null);
         if ($failedMessage !== null)
-            $out = '<div class="alert alert-failed">'.$failedMessage.'</div>';
+            $out = '<div class="alert alert-danger">'.$failedMessage.'</div>';
 
         return $out;
     }

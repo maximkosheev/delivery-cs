@@ -152,11 +152,12 @@ $this->registerJs($script, \yii\web\View::POS_READY);
                 // статус можно менять только у открытой заявки (та, у которой определен исполнитель)
                 if ($package->deliveryman_id !== null)
                     echo $form->field($package, 'status')->dropDownList([
+                        Package::STATUS_APPLIED => 'Открыта',
                         Package::STATUS_PICKUP => 'Забрал',
                         Package::STATUS_CANCELED => 'На возврат',
                         Package::STATUS_DELIVERED => 'Доставил',
                         Package::STATUS_BACKOFF => 'Возврат'
-                    ], ['prompt' => 'Если статус изменился...']);
+                    ]);
                 ?>
             </td>
         </tr>

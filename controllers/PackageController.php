@@ -8,13 +8,14 @@
 
 namespace app\controllers;
 
+use app\components\GCMService;
 use app\models\Deliveryman;
+use app\models\FinancesLog;
 use app\models\HistoryForm;
 use app\models\Manager;
 use app\models\Package;
 use app\models\PackageType;
 use app\models\User;
-use app\components\GCMService;
 use yii\base\InvalidParamException;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
@@ -95,7 +96,8 @@ class PackageController extends Controller
 
         if ($package->load(\Yii::$app->request->post())) {
             if ($package->save()) {
-                \Yii::$app->session->setFlash('actionSuccess', 'Заявка успешно создана!');
+                // если курьер не занад, отправляем уведомление курьерам
+                if ($package->deliveryman_id == null) {
                 // находим всех курьеров, которые могут выполнить данную заявку
                 $deliverymans = User::find()
                     ->leftJoin('tbl_user_package_type_assignment', 'tbl_user.id = tbl_user_package_type_assignment.user_id')
@@ -113,6 +115,8 @@ class PackageController extends Controller
                 }
                 // отправляем запрос на доставку уведомлений
                 GCMService::sendNotification($registration_ids, $subject, $message);
+                }
+                \Yii::$app->session->setFlash('actionSuccess', 'Заявка успешно создана!');
                 $this->redirect(['package/index']);
             }
             else
@@ -176,15 +180,25 @@ class PackageController extends Controller
         if (!\Yii::$app->user->can('updateDelivery', ['package' => $package]))
             throw new ForbiddenHttpException('У вас не достаточно прав на выполнения данной операции');
 
-        $oldStatus = $package->status;
+        $oldDeliveryman = $package->deliveryman_id;
         if ($package->load(\Yii::$app->request->post())) {
-            // если задан исполнитель, открываем заявку
-            if ($package->isAttributeChanged('deliveryman_id', false) && $package->deliveryman_id != null) {
-                $package->status = Package::STATUS_APPLIED;
-                $package->open_time = date('Y-m-d H:i:s', time());
+            // Изменился курьер - открываем заявку для нового исполнителя
+            if (!empty($package->deliveryman_id) && $package->deliveryman_id != $oldDeliveryman) {
+                $deliveryman = Deliveryman::findOne(['user_id' => $package->deliveryman_id]);
+                $deliveryman->undertake($package, false);
             }
-            if (empty($package->status))
-                $package->status = $oldStatus;
+            // статус заявки изменился
+            if ($package->isAttributeChanged('status', false)) {
+                $deliveryman = Deliveryman::findOne(['user_id' => $package->deliveryman_id]);
+                // статус можно менять только у открытой заявки, поэтому курьер должен быть задан
+                if ($deliveryman === null)
+                    throw new NotFoundHttpException('Курьер не найден ');
+
+                if ($package->status == Package::STATUS_DELIVERED)
+                    $deliveryman->delivered($package, false);
+                if ($package->status == Package::STATUS_BACKOFF)
+                    $deliveryman->backoff($package, false);
+            }
             if ($package->save()) {
                 \Yii::$app->session->setFlash('actionSuccess', 'Заявка успешно сохранена!', false);
                 $this->redirect(['package/index']);

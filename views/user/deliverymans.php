@@ -61,11 +61,17 @@ echo GridView::widget([
                         'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
                         'data-pjax' => '0',
                     ];
-                    return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
+                    if ($model->identity->active)
+                        return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
+                    else
+                        return null;
                 },
                 'restore' => function($url, $model, $key) {
                     $options = [];
-                    return Html::a('<span class="glyphicon glyphicon-pushpin"></span>', $url, $options);
+                    if (!$model->identity->active)
+                        return Html::a('<span class="glyphicon glyphicon-check"></span>', $url, $options);
+                    else
+                        return null;
                 }
             ],
             'headerOptions' => [
@@ -73,6 +79,7 @@ echo GridView::widget([
             ]
         ]
     ],
+    'tableOptions' => ['class' => 'table table-bordered'],
     'rowOptions' => function($model, $key, $index, $grid) {
         if ($model->identity->active)
             return ['class' => 'active-user-row'];

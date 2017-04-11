@@ -9,6 +9,7 @@
 
 use yii\helpers\Url;
 use yii\widgets\Breadcrumbs;
+use yii\jui\Dialog;
 use app\components\widgets\ActionStatusMessage;
 
 
@@ -55,6 +56,18 @@ echo Breadcrumbs::widget([
     ]
 ]);
 
+Dialog::begin([
+    'clientOptions'=>[
+        'dialogClass' => 'mydialog',
+        'autoOpen' => false,
+        'modal' => true,
+        'title' => 'Результат операции'
+    ],
+]);
+ echo '<div>Стоимость заявки изменена</div>';
+
+Dialog::end();
+
 $setCostScript = <<< JS
 	function setCost(id, value) {
 	    value = value.replace("<br>", "");
@@ -66,7 +79,10 @@ $setCostScript = <<< JS
 	            value: value
 	        },
 	        success: function(response){
-	            console.log(response);
+	            $('#actionMessage').html('<div class="alert alert-success">Стоимость заявки изменена</div>');
+	        },
+	        error:function(response) {
+	            $('#actionMessage').html('<div class="alert alert-danger">Стоимость заявки не изменена</div>');
 	        }
 	    })
 	}
@@ -78,12 +94,12 @@ $ajaxDeleteScript = <<< JS
             event.preventDefault();
             var deleteUrl = $(this).attr('url');
             var pjaxContainer = $(this).attr('pjax-container');
-            if (confirm('Выдействительно хотите удалить данную заявку?')) {
+            if (confirm('Вы действительно хотите удалить данную заявку?')) {
                 $.ajax({
                     url: deleteUrl,
                     type: 'post',
                     error: function(xhr, status, error) {
-                        $('#actionMessage').html('<div class="alert alert-failed">Заявка не удалена из-за неполадок на сервере</div>');
+                        $('#actionMessage').html('<div class="alert alert-danger">'+ xhr.responseText +'</div>');
                     }
                 }).done(function(data){
                     $.pjax.reload({container: '#' + $.trim(pjaxContainer)});

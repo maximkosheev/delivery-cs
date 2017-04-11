@@ -28,7 +28,10 @@ if (Yii::$app->user->identity->isAdmin)
         ['label'=>'Отчеты', 'items' => [
             ['label'=>'История заявок', 'url'=>Url::to(['package/history'])],
         ]],
-        ['label'=>'Финансы', 'url'=>Url::to(['finance/receipt'])]
+        ['label'=>'Финансы', 'items'=>[
+            ['label' => 'Отправить денег', 'url'=>Url::to(['finances/receipt'])],
+            ['label' => 'Балансы', 'url' => Url::to(['finances/deliverymans'])]
+        ]]
     ];
 else if (Yii::$app->user->identity->isManager)
     return [

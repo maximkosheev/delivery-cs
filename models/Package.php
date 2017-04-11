@@ -66,7 +66,7 @@ class Package extends ActiveRecord
             [['address_from', 'address_to'], 'string', 'max'=>255, 'message' => 'Длина не может превышать 255 символов'],
             [['phone_from', 'phone_to'], 'string', 'max'=>20, 'message' => 'Длина не может превышать 20 символов'],
             [['model', 'delivery_type'], 'string', 'max'=>50, 'message' => 'Длина не может превышать 50 символов'],
-            [['cost', 'purchase_price', 'selling_price'], 'string', 'max'=>12, 'message' => 'Длина не может превышать 12 символов'],
+            [['cost', 'purchase_price', 'selling_price'], 'double', 'message' => 'Поле должно быть числом с десятичной точкой'],
             [['status', 'deliveryman_id', 'create_time', 'open_time', 'close_time', 'deadline_time', 'deliveryTypes', 'more'], 'safe'],
         ];
     }
@@ -86,9 +86,11 @@ class Package extends ActiveRecord
             $this->deadline_time = date('Y-m-d H:i:s', time() + 14400);
         }
 
+        if ($this->status === self::STATUS_APPLIED) {
+            $this->close_time = null;
+        }
+
         if ($this->status === self::STATUS_BACKOFF) {
-            $this->purchase_price = 0;
-            $this->selling_price = 0;
             $this->close_time = date('Y-m-d H:i:s', time());
         }
 
