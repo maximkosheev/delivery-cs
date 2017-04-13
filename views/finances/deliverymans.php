@@ -46,4 +46,10 @@ echo GridView::widget([
             'format' => 'text'
         ]
     ],
+    'rowOptions' => function($model, $key, $index, $grid) {
+        if ($model->balance === 0)
+            return ['class' => 'invisible-row'];
+        else
+            return [];
+    }
 ]);

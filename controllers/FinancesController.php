@@ -76,8 +76,16 @@ class FinancesController extends Controller
 
     public function actionDeliverymans()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Deliveryman::find(),
+        $deliverymans = Deliveryman::find()->all();
+
+        $x = [];
+        foreach ($deliverymans as $deliveryman) {
+            if ($deliveryman->balance !== 0) {
+                $x[] = $deliveryman;
+            }
+        }
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $x,
             'pagination' => [
                 'pageSize' => 20
             ]
@@ -102,63 +110,62 @@ class FinancesController extends Controller
             switch ($package->status) {
                 case Package::STATUS_APPLIED:
                     // информация о закупке товара
-                    $financesItem = new FinancesItem();
-                    $financesItem->time = $package->open_time;
-                    $financesItem->cash = -$package->purchase_price;
-                    $financesItem->description = "Закупка по заявке #{$package->id}";
-                    $financesItems[] = $financesItem;
+                    $financesItems[] = new FinancesItem([
+                        'time' => $package->open_time,
+                        'cash' => -$package->purchase_price,
+                        'description' => "Закупка по заявке #{$package->id}"
+                    ]);
                     break;
                 case Package::STATUS_DELIVERED:
                     // информация о закупке товара
-                    $financesItem = new FinancesItem();
-                    $financesItem->time = $package->open_time;
-                    $financesItem->cash = -$package->purchase_price;
-                    $financesItem->description = "Закупка по заявке #{$package->id}";
-                    $financesItems[] = $financesItem;
+                    $financesItems[] = new FinancesItem([
+                        'time' => $package->open_time,
+                        'cash' => -$package->purchase_price,
+                        'description' => "Закупка по заявке #{$package->id}"
+                    ]);
                     // информация о продаже товара
-                    $financesItem = new FinancesItem();
-                    $financesItem->time = $package->close_time;
-                    $financesItem->cash = $package->selling_price;
-                    $financesItem->description = "Продажа по заявке #{$package->id}";
-                    $financesItems[] = $financesItem;
+                    $financesItems[] = new FinancesItem([
+                        'time' => $package->close_time,
+                        'cash' => $package->selling_price,
+                        'description' => "Продажа по заявке #{$package->id}"
+                    ]);
                     // информация о доставке
-                    $financesItem = new FinancesItem();
-                    $financesItem->time = $package->close_time;
-                    $financesItem->cash = -$package->cost;
-                    $financesItem->description = "Доставка по заявке #{$package->id}";
-                    $financesItems[] = $financesItem;
+                    $financesItems[] = new FinancesItem([
+                        'time' => $package->close_time,
+                        'cash' => -$package->cost,
+                        'description' => "Доставка по заявке #{$package->id}"
+                    ]);
                     break;
                 case Package::STATUS_BACKOFF:
                     // информация о закупке товара
-                    $financesItem = new FinancesItem();
-                    $financesItem->time = $package->open_time;
-                    $financesItem->cash = -$package->purchase_price;
-                    $financesItem->description = "Закупка по заявке #{$package->id}";
-                    $financesItems[] = $financesItem;
+                    $financesItems[] = new FinancesItem([
+                        'time' => $package->open_time,
+                        'cash' => -$package->purchase_price,
+                        'description' => "Закупка по заявке #{$package->id}"
+                    ]);
                     // информация о возврате товара
-                    $financesItem = new FinancesItem();
-                    $financesItem->time = $package->close_time;
-                    $financesItem->cash = $package->purchase_price;
-                    $financesItem->description = "Возврат по заявке #{$package->id}";
-                    $financesItems[] = $financesItem;
+                    $financesItems[] = new FinancesItem([
+                        'time' => $package->close_time,
+                        'cash' => $package->purchase_price,
+                        'description' => "Возврат по заявке #{$package->id}"
+                    ]);
                     // информация о доставке
-                    $financesItem = new FinancesItem();
-                    $financesItem->time = $package->close_time;
-                    $financesItem->cash = -$package->cost;
-                    $financesItem->description = "Доставка по заявке #{$package->id}";
-                    $financesItems[] = $financesItem;
+                    $financesItems[] = new FinancesItem([
+                        'time' => $package->close_time,
+                        'cash' => -$package->cost,
+                        'description' => "Доставка по заявке #{$package->id}"
+                    ]);
                     break;
             }
-            $financesItems[] = $financesItem;
         }
 
         $a = FinancesLog::findAll(['deliveryman_id' => $id]);
         foreach ($a as $o) {
-            $financesItem = new FinancesItem();
-            $financesItem->time = $o->time;
-            $financesItem->cash = $o->cash;
-            $financesItem->description = $o->description;
-            $financesItems[] = $financesItem;
+            $financesItems[] = new FinancesItem([
+                'time' => $o->time,
+                'cash' => $o->cash,
+                'description' => $o->description
+            ]);
         }
 
         $dataProvider = new ArrayDataProvider([

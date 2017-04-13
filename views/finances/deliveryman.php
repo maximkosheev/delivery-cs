@@ -31,7 +31,7 @@ echo Breadcrumbs::widget([
 echo '<h2>'.$deliveryman->fio.'</h2>';
 
 echo Html::a('Отправить денег', ['finances/receipt', 'id' => $deliveryman->user_id], ['class' => 'btn btn-lg btn-success']);
-
+ echo '<h3>Баланс: '.$deliveryman->balance.'</h3>';
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'emptyText' => 'Ничего не найдено',

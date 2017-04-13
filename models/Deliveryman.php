@@ -303,6 +303,7 @@ class Deliveryman extends Worker
         $b5 = Package::find()
             ->where(['deliveryman_id' => $this->user_id])
             ->andWhere(['status' => Package::STATUS_DELIVERED])
+            ->orWhere(['status' => Package::STATUS_BACKOFF])
             ->sum('cost');
 
         return $b1 - $b2 + $b3 +$b4 - $b5;

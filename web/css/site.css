@@ -208,3 +208,7 @@ table.request-data td{
 #history-config td {
     padding: 5px;
 }
+
+.invisible-row {
+    display: none;
+}
