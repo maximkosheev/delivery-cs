@@ -373,7 +373,8 @@ class PackageController extends Controller
         $model = new HistoryForm();
 
         $packages = Package::find()
-            ->with(['manager', 'deliveryman']);
+            ->with(['manager', 'deliveryman'])
+            ->orderBy('create_time DESC');
         $deliverymans = Deliveryman::find();
         $managers = Manager::find();
 
@@ -413,7 +414,8 @@ class PackageController extends Controller
         $model = new HistoryForm();
 
         $packages = Package::find()
-            ->with(['manager', 'deliveryman']);
+            ->with(['manager', 'deliveryman'])
+            ->orderBy('create_time DESC');
 
         if ($model->load(\Yii::$app->request->get())) {
             if (!empty($model->dateFrom)) {

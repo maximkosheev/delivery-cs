@@ -180,15 +180,7 @@ echo GridView::widget([
             },
             'format' => 'raw'
         ],
-        [
-            'class' => 'yii\grid\DataColumn',
-            'attribute' => 'cost',
-            'visible' => Yii::$app->user->identity->isAdmin,
-            'contentOptions' => [
-                'contenteditable' => 'true',
-                'onchange' => 'setCost($(this).closest("tr").attr("data-key"), $(this).data("before"))',
-            ]
-        ],
+        'cost',
         'purchase_price',
         'selling_price',
         [

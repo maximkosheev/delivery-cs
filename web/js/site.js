@@ -39,6 +39,7 @@ $(function(){
     $('body')
         .on('focus', '[contenteditable]',
             function(){
+                document.execCommand('selectAll', false, null);
                 $(this).data('before', $(this).html());
                 return $(this);
             }

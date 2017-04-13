@@ -52,13 +52,13 @@ echo GridView::widget([
         'fio',
         [
             'class' => 'yii\grid\ActionColumn',
-            'template'=>'{update}{delete}{restore}',
+            'template'=>'{update}{block}{unblock}',
             'buttons' => [
-                'delete' => function($url, $model, $key) {
+                'block' => function($url, $model, $key) {
                     $options = [
-                        'title' => Yii::t('yii', 'Delete'),
-                        'aria-label' => Yii::t('yii', 'Delete'),
-                        'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                        'title' => Yii::t('yii', 'Блокировать'),
+                        'aria-label' => Yii::t('yii', 'Блокировать'),
+                        'data-confirm' => Yii::t('yii', 'Вы действительно хотите блокировать данного курьера?'),
                         'data-pjax' => '0',
                     ];
                     if ($model->identity->active)
@@ -66,10 +66,15 @@ echo GridView::widget([
                     else
                         return null;
                 },
-                'restore' => function($url, $model, $key) {
-                    $options = [];
+                'unblock' => function($url, $model, $key) {
+                    $options = [
+                        'title' => Yii::t('yii', 'Разблокировать'),
+                        'aria-label' => Yii::t('yii', 'Разблокировать'),
+                        'data-confirm' => Yii::t('yii', 'Вы действительно хотите разблокировать данного курьера?'),
+                        'data-pjax' => '0',
+                    ];
                     if (!$model->identity->active)
-                        return Html::a('<span class="glyphicon glyphicon-check"></span>', $url, $options);
+                        return Html::a('<span class="glyphicon glyphicon-share-alt"></span>', $url, $options);
                     else
                         return null;
                 }
@@ -85,6 +90,9 @@ echo GridView::widget([
             return ['class' => 'active-user-row'];
         else
             return ['class' => 'inactive-user-row'];
-    }
+    },
+    'tableOptions' => [
+        'class' => 'table table-stripted table-bordered table-simple'
+    ]
 ]);
 

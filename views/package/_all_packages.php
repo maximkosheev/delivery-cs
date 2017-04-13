@@ -53,7 +53,13 @@ echo GridView::widget([
             'contentOptions' => [
                 'contenteditable' => 'true',
                 'onchange' => 'setCost($(this).closest("tr").attr("data-key"), $(this).data("before"))',
-            ]
+            ],
+            'value' => function(\app\models\Package $data) {
+                if ($data->cost === null)
+                    return '0';
+                else
+                    return Html::encode($data->cost);
+            }
         ],
         'purchase_price',
         'selling_price',
