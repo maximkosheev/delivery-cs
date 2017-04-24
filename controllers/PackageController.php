@@ -98,23 +98,23 @@ class PackageController extends Controller
             if ($package->save()) {
                 // если курьер не занад, отправляем уведомление курьерам
                 if ($package->deliveryman_id == null) {
-                // находим всех курьеров, которые могут выполнить данную заявку
-                $deliverymans = User::find()
-                    ->leftJoin('tbl_user_package_type_assignment', 'tbl_user.id = tbl_user_package_type_assignment.user_id')
-                    ->where(['tbl_user_package_type_assignment.type_id' => $package->package_type])
-                    ->all();
-                $registration_ids = [];
-                $subject = 'Новая заявка';
-                $message = [
-                    'id' => $package->id,
-                    'address_from' => $package->address_from,
-                    'address_to' => $package->address_to,
-                ];
-                foreach ($deliverymans as $deliveryman) {
-                    $registration_ids[] = $deliveryman->token;
-                }
-                // отправляем запрос на доставку уведомлений
-                GCMService::sendNotification($registration_ids, $subject, $message);
+                    // находим всех курьеров, которые могут выполнить данную заявку
+                    $deliverymans = User::find()
+                        ->leftJoin('tbl_user_package_type_assignment', 'tbl_user.id = tbl_user_package_type_assignment.user_id')
+                        ->where(['tbl_user_package_type_assignment.type_id' => $package->package_type])
+                        ->all();
+                    $registration_ids = [];
+                    $subject = 'Новая заявка';
+                    $message = [
+                        'id' => $package->id,
+                        'address_from' => $package->address_from,
+                        'address_to' => $package->address_to,
+                    ];
+                    foreach ($deliverymans as $deliveryman) {
+                        $registration_ids[] = $deliveryman->token;
+                    }
+                    // отправляем запрос на доставку уведомлений
+                    GCMService::sendNotification($registration_ids, $subject, $message);
                 }
                 \Yii::$app->session->setFlash('actionSuccess', 'Заявка успешно создана!');
                 $this->redirect(['package/index']);
