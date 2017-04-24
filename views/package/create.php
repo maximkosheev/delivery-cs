@@ -126,6 +126,15 @@ echo ActionStatusMessage::widget([]);
         </tr>
         <tr>
             <td>
+                <?= $form->field($package, 'deliveryman_id')->dropDownList([], [
+                    'id' => 'package_deliverymans',
+                    'data-url' => Url::to(['package/deliverymans']),
+                    'prompt' => 'Выберете курьера'
+                ]); ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <?= $form->field($package, 'deliveryTypes')->checkboxList(
                     $package->getDeliveryTypeOptions(),
                     ['itemOptions' => [
