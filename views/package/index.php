@@ -88,34 +88,10 @@ $setCostScript = <<< JS
 	}
 JS;
 
-$ajaxDeleteScript = <<< JS
-    $(document).on('ready pjax:success', function() {
-        $('.ajaxDelete').on('click', function(event) {
-            event.preventDefault();
-            var deleteUrl = $(this).attr('url');
-            var pjaxContainer = $(this).attr('pjax-container');
-            if (confirm('Вы действительно хотите удалить данную заявку?')) {
-                $.ajax({
-                    url: deleteUrl,
-                    type: 'post',
-                    error: function(xhr, status, error) {
-                        $('#actionMessage').html('<div class="alert alert-danger">'+ xhr.responseText +'</div>');
-                    }
-                }).done(function(data){
-                    $.pjax.reload({container: '#' + $.trim(pjaxContainer)});
-                    $('#actionMessage').html('<div class="alert alert-success">Заявка успешно удалена</div>');
-                });
-            }
-        })
-    });
-JS;
-
-
 echo '<div id="actionMessage">';
 echo ActionStatusMessage::widget([]);
 echo '</div>';
 
 $this->registerJs($setCostScript, \yii\web\View::POS_BEGIN);
-$this->registerJs($ajaxDeleteScript);
 
 echo $this->render($partial, ['packages' => $packages]);

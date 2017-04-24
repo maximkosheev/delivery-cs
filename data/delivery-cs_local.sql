@@ -198,6 +198,21 @@ CREATE TABLE IF NOT EXISTS `tbl_finances_log` (
   `description` text,
   KEY `fk_deliveryman_d` (`deliveryman_id`)
 )ENGINE=InnoDB DEFAULT CHARSET =utf8;
+
+
+--
+-- Table structure for table tbl_stock
+--
+
+CREATE TABLE IF NOT EXISTS `tbl_stock` (
+  id VARCHAR(22) NOT NULL,
+  brand VARCHAR(22) DEFAULT NULL,
+  description TEXT DEFAULT NULL,
+  purchase_price FLOAT DEFAULT 0.0,
+  owner VARCHAR(22) DEFAULT '',
+  UNIQUE KEY `article` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- --
 -- Constraints for dumped tables
 --

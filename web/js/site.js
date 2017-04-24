@@ -71,4 +71,23 @@ $(function(){
                 return $(this);
             }
         )
+    $(document).on('ready pjax:success', function() {
+        $('.ajaxDelete').on('click', function(event) {
+            event.preventDefault();
+            var deleteUrl = $(this).attr('url');
+            var pjaxContainer = $(this).attr('pjax-container');
+            if (confirm('Вы действительно хотите удалить этот элемент?')) {
+                $.ajax({
+                    url: deleteUrl,
+                    type: 'post',
+                    error: function(xhr, status, error) {
+                        $('#actionMessage').html('<div class="alert alert-danger">'+ xhr.responseText +'</div>');
+                    }
+                }).done(function(data){
+                    $.pjax.reload({container: '#' + $.trim(pjaxContainer)});
+                    $('#actionMessage').html('<div class="alert alert-success">Элемент успешно удален</div>');
+                });
+            }
+        })
+    });
 })
