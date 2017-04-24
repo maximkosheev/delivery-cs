@@ -301,11 +301,17 @@ class Deliveryman extends Worker
             ->sum('purchase_price');
         // подсчет списаний "стоимость доставки"
         $b5 = Package::find()
-            ->where(['deliveryman_id' => $this->user_id])
-            ->andWhere(['status' => Package::STATUS_DELIVERED])
-            ->orWhere(['status' => Package::STATUS_BACKOFF])
+            ->where([
+                'AND',
+                ['deliveryman_id' => $this->user_id],
+                [
+                    'OR',
+                    ['status' => Package::STATUS_DELIVERED],
+                    ['status' => Package::STATUS_BACKOFF]
+                ]
+            ])
             ->sum('cost');
 
-        return $b1 - $b2 + $b3 +$b4 - $b5;
+        return $b1 - $b2 + $b3 + $b4 - $b5;
     }
 }
