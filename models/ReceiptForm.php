@@ -14,12 +14,13 @@ class ReceiptForm extends Model
 {
     public $deliveryman_id;
     public $cash;
+    public $time;
     public $description;
 
     public function rules()
     {
         return [
-            [['deliveryman_id', 'cash'], 'required', 'message'=>'Поле не может быть пустым'],
+            [['deliveryman_id', 'cash', 'time'], 'required', 'message'=>'Поле не может быть пустым'],
             ['cash', 'double', 'message'=>'Поле должно быть числом'],
             ['description', 'safe']
         ];
@@ -30,6 +31,7 @@ class ReceiptForm extends Model
         return [
             'deliveryman_id' => 'Курьер',
             'cash' => 'Сумма',
+            'time' => 'Дата',
             'description' => 'Описание'
         ];
     }

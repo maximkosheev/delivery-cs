@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `tbl_user_package_type_assignment` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tbl_user_package_type_assignment`
+-- Table structure for table `tbl_finances_log`
 --
 
 CREATE TABLE IF NOT EXISTS `tbl_finances_log` (

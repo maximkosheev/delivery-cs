@@ -216,3 +216,7 @@ table.request-data td{
 .invisible-row {
     display: none;
 }
+
+.grid-view {
+    margin-top: 20px;
+}

@@ -8,6 +8,7 @@
 
 namespace app\models;
 
+use app\common\behaviors\FormatDateBehavior;
 use app\common\behaviors\SetDateTimeBehavior;
 use yii\db\ActiveRecord;
 
@@ -38,9 +39,10 @@ class FinancesLog extends ActiveRecord
     public function behaviors()
     {
         return [
-            'setDT' => [
-                'class' => SetDateTimeBehavior::className(),
-                'resProp' => 'time'
+            'formatDate' => [
+                'class' => FormatDateBehavior::className(),
+                'srcAttr' => 'time',
+                'destAttr' => 'time'
             ]
         ];
     }

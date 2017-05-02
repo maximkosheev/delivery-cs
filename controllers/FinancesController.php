@@ -9,6 +9,7 @@
 namespace app\controllers;
 
 use app\models\Deliveryman;
+use app\models\FinancesFilter;
 use app\models\FinancesItem;
 use app\models\Package;
 use app\models\ReceiptForm;
@@ -47,7 +48,7 @@ class FinancesController extends Controller
     /* Поступление денежных средств на счет курьера */
     public function actionReceipt()
     {
-        $model = new ReceiptForm();
+        $model = new ReceiptForm(['time' => date('Y-m-d H:i:s', time())]);
         $delivermans = Deliveryman::find()
             ->innerJoin('tbl_user', 'tbl_deliveryman.user_id = tbl_user.id')
             ->where(['active' => 1])
@@ -61,6 +62,7 @@ class FinancesController extends Controller
             $log = new FinancesLog();
             $log->deliveryman_id = $deliveryman->user_id;
             $log->cash = $model->cash;
+            $log->time = $model->time;
             $log->description = $model->description;
             if ($log->save(false))
                 \Yii::$app->session->setFlash('actionSuccess', "На счет курьера {$deliveryman->fio} успешно отправлено {$model->cash} рублей");
@@ -103,9 +105,30 @@ class FinancesController extends Controller
         if ($deliveryman === null)
             throw new NotFoundHttpException('Курьер не найден');
 
+        $filterModel = new FinancesFilter();
+
+        $packageQuery = Package::find()->where(['deliveryman_id' => $id]);
+        $receiptQuery = FinancesLog::find()->where(['deliveryman_id' => $id]);
+
+        if ($filterModel->load(\Yii::$app->request->post())) {
+            if ($filterModel->dateFrom != null) {
+                $dateFrom = \DateTime::createFromFormat('d-m-Y', $filterModel->dateFrom);
+                $packageQuery->andWhere(['>=', 'create_time', $dateFrom->format('Y-m-d 00:00:00')]);
+                $receiptQuery->andWhere(['>=', 'time', $dateFrom->format('Y-m-d 00:00:00')]);
+            }
+
+            if ($filterModel->dateTo != null) {
+                $dateTo = \DateTime::createFromFormat('Y-m-d', $filterModel->dateTo)->add(new \DateInterval('P1D'));
+                $packageQuery->andWhere(['<', 'create_time', $dateTo->format('Y-m-d 00:00:00')]);
+                $receiptQuery->andWhere(['<', 'time', $dateTo->format('Y-m-d 00:00:00')]);
+            }
+        }
+
         $financesItems = [];
         // собираем информацию о финансовых операциях по заявкам
-        $packages = Package::findAll(['deliveryman_id' => $id]);
+        $packages = $packageQuery
+            ->orderBy('create_time DESC')
+            ->all();
         foreach ($packages as $package) {
             switch ($package->status) {
                 case Package::STATUS_APPLIED:
@@ -159,7 +182,9 @@ class FinancesController extends Controller
             }
         }
 
-        $a = FinancesLog::findAll(['deliveryman_id' => $id]);
+        $a = $receiptQuery
+            ->orderBy('time DESC')
+            ->all();
         foreach ($a as $o) {
             $financesItems[] = new FinancesItem([
                 'time' => $o->time,
@@ -171,7 +196,7 @@ class FinancesController extends Controller
         $dataProvider = new ArrayDataProvider([
             'allModels' => $financesItems,
             'sort' => [
-                'defaultOrder' => 'time asc'
+                'defaultOrder' => 'time DESC'
             ],
             'pagination' => [
                 'pageSize' => 20
@@ -180,7 +205,8 @@ class FinancesController extends Controller
 
         return $this->render('deliveryman', [
             'deliveryman' => $deliveryman,
-            'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider,
+            'filterModel' => $filterModel
         ]);
     }
 }

@@ -12,6 +12,7 @@
 use yii\widgets\ActiveForm;
 use yii\widgets\Breadcrumbs;
 use yii\helpers\Html;
+use yii\jui\DatePicker;
 use app\components\widgets\ActionStatusMessage;
 
 $this->title = 'Отправка денежных средств курьеру';
@@ -34,6 +35,12 @@ $form = ActiveForm::begin([
 
 echo $form->field($model, 'deliveryman_id')->dropDownList($deliverymans, ['prompt' => 'Выберете курьера']);
 echo $form->field($model, 'cash')->textInput();
+echo $form->field($model, 'time')->widget(DatePicker::className(), [
+    'dateFormat' => 'dd-MM-yyyy',
+    'options' => [
+        'class' => 'form-control',
+    ]
+]);
 echo $form->field($model, 'description')->textarea();
 echo '<br>';
 echo Html::submitButton('Отправить', ['class' => 'btn btn-lg btn-success']);

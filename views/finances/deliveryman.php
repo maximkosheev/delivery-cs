@@ -7,13 +7,15 @@
  * @var \yii\web\View $this
  * @var \app\models\Deliveryman $deliveryman
  * @var \yii\data\ActiveDataProvider $dataProvider
+ * @var \app\models\FinancesFilter $filterModel
  */
 
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\Breadcrumbs;
-use app\models\FinancesLog;
+ use yii\widgets\ActiveForm;
+ use yii\jui\DatePicker;
 
 $this->title = $deliveryman->fio;
 
@@ -28,10 +30,28 @@ echo Breadcrumbs::widget([
     ]
 ]);
 
-echo '<h2>'.$deliveryman->fio.'</h2>';
+echo '<h2>'."Курьер - $deliveryman->fio".'</h2>';
+echo '<h3>Баланс: '.$deliveryman->balance.'</h3>';
+echo Html::a('Отправить деньги', ['finances/receipt', 'id' => $deliveryman->user_id], ['class' => 'btn btn-lg btn-success']);
 
-echo Html::a('Отправить денег', ['finances/receipt', 'id' => $deliveryman->user_id], ['class' => 'btn btn-lg btn-success']);
- echo '<h3>Баланс: '.$deliveryman->balance.'</h3>';
+ $form = ActiveForm::begin(['id' => 'filter-form']);
+ echo '<h2>Фильтр по датам создания заявок:</h2>';
+ echo $form->field($filterModel, 'dateFrom')->widget(DatePicker::className(), [
+     'dateFormat' => 'dd-MM-yyyy',
+     'options' => [
+         'class' => 'form-control',
+     ]
+ ]);
+ echo $form->field($filterModel, 'dateTo')->widget(DatePicker::className(), [
+     'dateFormat' => 'dd-MM-yyyy',
+     'options' => [
+         'class' => 'form-control',
+     ]
+ ]);
+ echo '<br>';
+ echo Html::submitButton('Применить фильтр', ['class' => 'btn btn-lg btn-success']);
+ ActiveForm::end();
+
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'emptyText' => 'Ничего не найдено',

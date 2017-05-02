@@ -18,7 +18,7 @@ class SetDateTimeBehavior extends Behavior
     public function events()
     {
         return [
-            ActiveRecord::EVENT_BEFORE_INSERT => 'setDT',
+            ActiveRecord::EVENT_BEFORE_VALIDATE => 'setDT',
         ];
     }
 
