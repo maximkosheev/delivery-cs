@@ -118,7 +118,7 @@ class FinancesController extends Controller
             }
 
             if ($filterModel->dateTo != null) {
-                $dateTo = \DateTime::createFromFormat('d-m-Y', $filterModel->dateTo)->add(new \DateInterval('P1D'));
+                $dateTo = \DateTime::createFromFormat('Y-m-d', $filterModel->dateTo)->add(new \DateInterval('P1D'));
                 $packageQuery->andWhere(['<', 'create_time', $dateTo->format('Y-m-d 00:00:00')]);
                 $receiptQuery->andWhere(['<', 'time', $dateTo->format('Y-m-d 00:00:00')]);
             }
@@ -196,7 +196,10 @@ class FinancesController extends Controller
         $dataProvider = new ArrayDataProvider([
             'allModels' => $financesItems,
             'sort' => [
-                'defaultOrder' => 'time DESC'
+                'attributes' => ['time'],
+                'defaultOrder' => [
+                    'time' => SORT_DESC
+                ]
             ],
             'pagination' => [
                 'pageSize' => 20

@@ -21,7 +21,7 @@ class ReceiptForm extends Model
     {
         return [
             [['deliveryman_id', 'cash', 'time'], 'required', 'message'=>'Поле не может быть пустым'],
-            ['cash', 'double', 'message'=>'Поле должно быть числом'],
+            ['cash', 'number', 'integerOnly'=>true, 'message'=>'Поле должно целым числом'],
             ['description', 'safe']
         ];
     }
