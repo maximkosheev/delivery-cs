@@ -118,16 +118,16 @@ a.desc:after {
 .model-item {
     cursor: pointer;
     text-decoration: none;
-    color: blue;
+    color: #fff;
     margin: 2px;
-    background: none repeat scroll #808080;
+    background: none repeat scroll #337ab7;
     padding: 0.6em;
     border-radius: 2px;
     display: inline-block;
 }
 
 .model-item.active {
-    background: none repeat scroll #096ac8;
+    background: none repeat scroll #286090;
 }
 
 #model-name {
