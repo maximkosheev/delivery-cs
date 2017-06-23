@@ -272,9 +272,10 @@ class Deliveryman extends Worker
                 return false;
         }
         $package->status = Package::STATUS_BACKOFF;
+		$package->close_time = date('Y-m-d H:i:s', time());
         // сохраняем значение цены закупки, потому что при возврате это значение сбрасывается в 0
         $purchase_price = $package->purchase_price;
-        if (!$package->save(true, ['status']))
+        if (!$package->save(true, ['status', 'close_time']))
             return false;
         return true;
     }

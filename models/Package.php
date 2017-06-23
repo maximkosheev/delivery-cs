@@ -66,7 +66,7 @@ class Package extends ActiveRecord
             [['address_from', 'address_to'], 'string', 'max'=>255, 'message' => 'Длина не может превышать 255 символов'],
             [['phone_from', 'phone_to'], 'string', 'max'=>20, 'message' => 'Длина не может превышать 20 символов'],
             [['model', 'delivery_type'], 'string', 'max'=>50, 'message' => 'Длина не может превышать 50 символов'],
-            [['cost', 'purchase_price', 'selling_price'], 'double', 'message' => 'Поле должно быть числом с десятичной точкой'],
+            [['cost', 'purchase_price', 'selling_price'], 'number', 'integerOnly' => true, 'message' => 'Поле должно быть целым числом'],
             [['status', 'deliveryman_id', 'create_time', 'open_time', 'close_time', 'deadline_time', 'deliveryTypes', 'more'], 'safe'],
         ];
     }
@@ -104,6 +104,13 @@ class Package extends ActiveRecord
             $this->delivery_type = implode(',', $this->deliveryTypes);
 
         return parent::beforeSave($insert);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        if (empty($this->close_time) && ($this->status == self::STATUS_DELIVERED || $this->status == self::STATUS_BACKOFF))
+            throw new \Exception('close_time attribute is not set while status is closed');
     }
 
     public function getStatusAllowRange()

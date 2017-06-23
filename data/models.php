@@ -22,13 +22,22 @@ return [
 		'porsche',
 		'toyota',
 		'volkswagen',
+      	'mini',
+      	'jaguar',
+      	'kia',
+      	'Hyundai',
+      	'двигат. и КПП'
     ],
     'trucks' => [
 		'man',
 		'iveco',
+      'scania',
 		'daf',
 		'volvo-track',
 		'renault-track',
 		'mercedes-track',
-    ]
+      	'др. грузовики',
+      	'ГОРДЕЕВ'
+    ],
+
 ];
